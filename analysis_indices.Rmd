@@ -1,0 +1,177 @@
+---
+title: "Sammlung der Indizes"
+output: html_notebook
+---
+
+Einlesen der Indizes
+
+```{r}
+#Librarys und Einlesen
+needs(tidyverse)
+needs(readxl)
+needs(countrycode)
+rm(list=ls())
+
+fh <- read_excel("input/freedomhouse.xls", sheet="countries")
+eiu <- read_csv("input/eiu.csv", 
+     col_types = cols(`2006` = col_number(), 
+         `2008` = col_number(), `2010` = col_number(), 
+         `2011` = col_number(), `2012` = col_number(), 
+         `2013` = col_number(), `2014` = col_number(), 
+         `2015` = col_number(), `2016` = col_number()))
+polity <- read_csv("input/polity.csv", 
+     col_types = cols(polity2 = col_number()))
+polity <- subset(polity, select=c("scode","country","code","year", "polity2"))
+vanhanen <- read_csv("input/vanhanen.csv", 
+     col_types = cols(ID = col_number(), Year = col_character()))
+undpcc <- read_csv("countrycodes/undp_countrycodes.csv") 
+
+vanhanen$Abbr <- countrycode(vanhanen$Abbr, "cowc", "iso3c", warn=TRUE)
+
+# countrycode(sourcevar, origin, destination, warn = TRUE, custom_dict = NULL,
+#   custom_match = NULL, origin_regex = FALSE)
+vanhanen <- subset(vanhanen, select=c("Abbr","Year","ID"))
+
+
+```
+
+```{r}
+#Preprocessing
+
+#FREEDOMHOUSE 
+fh <- fh %>%
+      gather(jahre, wert, `1972_PR`:`2016_Status`) %>%
+      subset(year!= "year" & year!= "status") %>%
+      na.omit() %>%
+      separate(jahre, c("jahre", "typ")) %>%
+      spread(typ, wert) %>%
+      mutate(CL = as.numeric(CL)) %>%
+      mutate(PR = as.numeric(PR)) %>%
+      mutate(fhmean = ((CL+PR)/2)) %>%
+      select(c("year", "code", "jahre", "fhmean", "Status")) %>%
+      mutate(fhmeanindex = ((((fhmean/7)*100)-100)*(-1)))
+
+#ECONOMIST
+eiu <- eiu %>%
+        gather(jahre, wert, `2006`: `2016` ) %>%
+        mutate(eiuindex = ((wert/10)*100))
+
+#POLITY
+polity$year <- as.numeric(polity$year)
+polity$polityindex <- (polity$polity2+10)*5
+polity$typ <- "polity"
+
+#VANHANEN
+vanhanen$vanhanenindex <- (vanhanen$ID/47.08)*100
+vanhanen$typ <- "vanhanen"
+
+#REORDERING
+names(fh)[names(fh)=="year"] <- "country"
+fh <- fh[c("country", "code", "jahre", "fhmeanindex")]
+fh$typ <- "fh"
+fh$jahre <- as.numeric(fh$jahre)
+
+eiu <- subset(eiu, select=c("code", "country","jahre","eiuindex"))
+eiu$typ <- "eiu"
+
+#Prefiltering
+polity <- polity %>%
+          subset(year>=1972) %>%
+          na.omit()
+
+polity <- subset(polity, select=c("code", "country", "year", "polityindex", "typ"))
+
+
+vanhanen$Year <- as.numeric(vanhanen$Year)
+vanhanen <- subset(vanhanen, Year>=1972 )
+
+#Countrycode 
+#fhtmp <- merge(x = fh, y = undpcc[ , c("projectcode", "iso3")], 
+#                                by.x = "code", by.y="projectcode", all=T)
+
+fh$code <- countrycode(fh$code, "cowc", "iso3c", warn=TRUE)
+polity$code <- countrycode(polity$code, "cowc", "iso3c", warn=TRUE)
+
+
+```
+
+```{r}
+#MERGING
+data <- merge(x = fh, y = polity[ , c("code", "year", "polityindex")], 
+                                by.x = c("code", "jahre"), by.y=c("code", "year"), 
+                                all.x=TRUE)
+
+data <- merge(x = data, y = eiu[ , c("code", "jahre", "eiuindex")], 
+                                by.x = c("code", "jahre"), by.y=c("code", "jahre"), 
+                                all.x=TRUE)
+
+data <- merge(x = data, y = vanhanen[ , c("Abbr", "Year", "vanhanenindex")], 
+                                by.x = c("code", "jahre"), by.y=c("Abbr", "Year"), 
+                                all.x=TRUE)
+
+data <- subset(data, select=-typ)
+
+```
+
+```{r}
+#ERSTE DATAWRAPPER GRAFIK
+russ_dw <- data %>%
+          subset(country=="Russia" & jahre>=1991)
+write.csv2(russ_dw, "datawrapper/russ_dw.csv")
+```
+
+```{r}
+#Erklären, dass Unterschiede bei hybriden Systemen am größten sind. 
+
+countindices <- data %>%
+        gather(index, value, fhmeanindex:vanhanenindex) %>%
+        na.omit() %>%
+        group_by(code, country, jahre) %>%
+        summarize(count = n())
+
+diff <- data %>%
+        gather(index, value, fhmeanindex:vanhanenindex) %>%
+        na.omit() 
+
+diffcount <- merge(x = diff, y = countindices[ , c("code", "jahre", "count")], 
+                                by.x = c("code", "jahre"), by.y=c("code", "jahre"), 
+                                all.x=TRUE)
+
+#Standardabweichung überall dort, wo mehr als drei indizes da sind
+diffcount <- diffcount %>%
+                subset(count>=3 & jahre >=2011) %>%
+                na.omit()
+
+sddiffcount <- diffcount %>%
+                group_by(code, country, jahre) %>%
+                summarize(sd = sd(value)) %>%
+                group_by(code, country) %>%
+                summarize(meansd = round(mean(sd),0))
+#####################################################################
+#Hier womöglich eine Small-Multiple-Chart generieren mit den Top-10
+#####################################################################
+
+
+#Nur für 2016 prüfen, ob die Polarisierungsthese stimmt
+
+pol <- diff %>%
+       subset(jahre>="2011") %>%
+      group_by(code, country) %>%
+      summarize(meandem = round(mean(value),0))
+
+#Mittlerer Fünf-Jahres-Demokratiewert vs. mittlere Standardabweichung
+
+polviz <- merge(x = pol, y = sddiffcount[ , c("code", "meansd")], 
+                                by.x ="code", by.y="code", 
+                                all.x=TRUE)%>%
+  na.omit()
+
+polviz$code2 <- countrycode(polviz$code, "iso3c", "country.name.de", warn=TRUE)
+
+write.csv2(polviz, "datawrapper/polviz.csv")
+```
+
+
+
+```
+
