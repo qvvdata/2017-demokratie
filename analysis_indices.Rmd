@@ -147,9 +147,12 @@ sddiffcount <- diffcount %>%
                 summarize(sd = sd(value)) %>%
                 group_by(code, country) %>%
                 summarize(meansd = round(mean(sd),0))
+
 #####################################################################
 #Hier womöglich eine Small-Multiple-Chart generieren mit den Top-10
 #####################################################################
+
+
 
 
 #Nur für 2016 prüfen, ob die Polarisierungsthese stimmt
