@@ -10,6 +10,7 @@ Einlesen der Indizes
 needs(tidyverse)
 needs(readxl)
 needs(xlsx)
+needs(ggthemes)
 needs(countrycode)
 rm(list=ls())
 
@@ -126,7 +127,7 @@ write.csv2(russ_dw, "datawrapper/russ_dw.csv")
 ```
 
 ```{r}
-#Erklären, dass Unterschiede bei hybriden Systemen am größten sind. 
+#Erklären, dass Unterschiede bei hybriden Systemen am größten sind. In dieser Variante rechnen wir mit der STANDARDABWEICHUNG
 
 temp <- data
 data <- temp
@@ -147,7 +148,7 @@ diffcount <- merge(x = diff, y = countindices[ , c("code", "jahre", "count")],
 
 #Standardabweichung überall dort, wo mehr als drei indizes da sind
 diffcount <- diffcount %>%
-                subset(count>=3 & jahre >=2011) %>%
+                subset(count>=3 & jahre >=2006) %>%
                 na.omit()
 
 temp <- diffcount
@@ -162,8 +163,6 @@ sddiffcount <- diffcount %>%
 #####################################################################
 #Hier womöglich eine Small-Multiple-Chart generieren mit den Top-10
 #####################################################################
-
-
 
 
 #Nur für 2016 prüfen, ob die Polarisierungsthese stimmt
@@ -186,7 +185,7 @@ write.csv2(polviz, "datawrapper/polviz.csv")
 ```
 
 
-#varianz
+#in dieser Variante wird Varianz statt Standardabweichung verwendet 
 
 ```{r}
 #Erklären, dass Unterschiede bei hybriden Systemen am größten sind. 
@@ -210,7 +209,7 @@ diffcount <- merge(x = diff, y = countindices[ , c("code", "jahre", "count")],
 
 #Standardabweichung überall dort, wo mehr als drei indizes da sind
 diffcount <- diffcount %>%
-                subset(count>=3 & jahre >=2011) %>%
+                subset(count>=2 & jahre >=2006) %>%
                 na.omit()
 
 temp <- diffcount
@@ -222,13 +221,30 @@ sddiffcount <- diffcount %>%
                 group_by(code, country, jahre) %>%
                 summarize(var = var(value)) %>%
                 group_by(code, country) %>%
-                summarize(meanvar = round(sqrt(mean(var)),digits=0)) 
+                summarize(meanvar = round(sqrt(mean(var)),digits=1)) 
                 
                 
 #####################################################################
 #Hier womöglich eine Small-Multiple-Chart generieren mit den Top-10
 #####################################################################
 
+top <- as.data.frame(sddiffcount)%>%
+       subset(country!="Russia") %>%
+        top_n(n = 10)
+
+top10 <- diffcount %>%
+        subset(country %in% top$country)
+
+
+top10$country_de <- countrycode(top10$code, "iso3c", "country.name.de", warn=TRUE)  
+
+top10p <- ggplot(data=top10, aes(x=jahre, y = value, colour = index, group = index)) + 
+  geom_line() + facet_wrap(~country_de, ncol = 2) +
+  scale_y_continuous(limits = c(0, 100))+
+  theme_tufte()+
+  theme(legend.position="top") 
+plot(top10p)
+ggsave("output/top10p.pdf", width = 17.5, height = 25, units="cm")
 
 #Nur für 2016 prüfen, ob die Polarisierungsthese stimmt
 
