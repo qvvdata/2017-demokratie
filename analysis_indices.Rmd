@@ -209,7 +209,7 @@ diffcount <- merge(x = diff, y = countindices[ , c("code", "jahre", "count")],
 
 #Standardabweichung überall dort, wo mehr als drei indizes da sind
 diffcount <- diffcount %>%
-                subset(count>=2 & jahre >=2006) %>%
+                subset(count>=3 & jahre >=2006) %>%
                 na.omit()
 
 temp <- diffcount
