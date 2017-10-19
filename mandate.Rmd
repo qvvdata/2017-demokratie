@@ -1,0 +1,38 @@
+---
+title: "mandate"
+author: "Gerald Gartner"
+date: "19 10 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+needs(tidyverse, readxl)
+```
+
+## Daten laden
+
+```{r cars}
+wahl2017 <- read_csv("wahl2017.csv")
+
+wahl2017_rwk <- wahl2017  %>%
+            filter(grepl(".*[a-zA-Z].*[a-zA-Z]",gkz)) %>%
+            filter(!grepl(".*99$",gkz))
+
+wahl2017_bls <- wahl2017  %>%
+            filter(grepl(".*0000.*",gkz)) 
+
+wahl2017_mandate <- rbind(wahl2017_rwk, wahl2017_bls)
+
+wahl2017_mandate <- wahl2017_mandate %>%
+                       rename(iso = gkz, 
+                              name = Gebietsname, 
+                              wahlberechtigt = Wahlberechtigte, 
+                              abgegeben = Abgegebene, 
+                              gueltig = Gültige) %>%
+                       select(-Ungültige)
+
+write.table(wahl2017_mandate,"daten.txt",sep="\t", quote=FALSE, row.names=FALSE)
+
+```
+
