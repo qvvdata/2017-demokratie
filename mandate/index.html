@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="style.css">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+<script src="https://data.addendum.org/gfx/oligrapher/pym.v1.min.js"></script>
+<link rel="stylesheet" href="https://data.addendum.org/gfx/ai2html/qvv.css" />
 </head>
 <body>
 <div id="container">
@@ -24,6 +26,7 @@
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="topojson.js"></script>
 <script>
+var pymChild = new pym.Child();
 var texte = [
 	"Von der <span class=\"huge\">Stimme zum Sitz</span>: Ein Blick auf Wahlkreise und Mandatsberechnung bei Nationalratswahlen in Österreich.",
 	"Die Mandatsvergabe verläuft auf drei Ebenen. Die oberste ist die <span class=\"huge\">Bundesebene</span>, also Österreich insgesamt, sie steht im Ablauf an letzter Stelle.",
@@ -32,31 +35,31 @@ var texte = [
 	"Die <span class=\"huge\">183 Nationalratsmandate</span> werden nach der Zahl der StaatsbürgerInnen (nicht der Wahlberechtigten) auf die Wahlkreise aufgeteilt.",
 	"Im <span class=\"huge\">ersten Ermittlungsverfahren</span> werden Grundmandate vergeben, Basis dafür ist die Wahlzahl: Gültige Stimmen im Bundesland geteilt durch die Zahl der Mandate im Bundesland. Die Wahlzahl ist für jeden Wahlkreis in einem Bundesland gleich, die Zahl der Mandate ist es nicht: Im Wahlkreis Osttirol gibt es ein Mandat, in Graz und Umgebung neun.",
 	"Damit sind die <span class=\"huge\">Kosten</span> für ein Grundmandat unterschiedlich hoch: In Graz und Umgebung reichten 2013 rund 12 Prozent der gültigen Stimmen, in Osttirol benötigte man über 90 Prozent.",
-	"<span class=\"huge\">Grundmandate</span> erzielen vor allem größere Parteien. Die Karte unten zeigt die Grundmandate 2013 (damals waren im Weinviertel sieben und in Niederösterreich Mitte fünf Mandate zu haben, 2017 ist es umgekehrt).",
-	"<span class=\"huge\">75 Mandate</span> wurden bei der vergangenen Nationalratswahl so vergeben, wobei SPÖ und ÖVP sogar die Mehrheit ihrer Sitze auf diesem Weg erhielten. Umgekehrt schafften die Grünen nur zwei, das Team Stronach und die NEOS gar kein Grundmandat.",
+	"<span class=\"huge\">Grundmandate</span> erzielen vor allem größere Parteien. Die Karte unten zeigt die Grundmandate 2017.",
+	"<span class=\"huge\">99 Mandate</span> wurden bei der Nationalratswahl so vergeben, wobei SPÖ und ÖVP sogar die Mehrheit ihrer Sitze auf diesem Weg erhielten. Umgekehrt schafften es weder NEOS noch PILZ, ein Grundmandat zu erreichen.",
 	"Im <span class=\"huge\">zweiten Ermittlungsverfahren</span>, der Landesebene, vergibt man die Mandate wieder anhand der Wahlzahl (gültige Stimmen / Wahlzahl, abgerundet). Es werden nur Parteien berücksichtigt, die entweder ein Grundmandat oder im Bundesgebiet mindestens vier Prozent der gültigen Stimmen erreicht haben. Zuvor erzielte Grundmandate werden abzogen.",
-	"Hier schnitten vor allem <span class=\"huge\">Grüne</span> und <span class=\"huge\">NEOS</span> gut ab, beide holten zwei Drittel ihrer Gesamtsitze auf Landesebene.",
+	"Hier schnitten vor allem <span class=\"huge\">NEOS</span> und <span class=\"huge\">PILZ</span> gut ab, beide holten zwei Drittel ihrer Gesamtsitze auf Landesebene.",
 	"Die übrigen Mandate werden in einer <span class=\"huge\">dritten Runde</span> vergeben.",
 	"Basis im dritten Ermittlungsverfahren sind alle <span class=\"huge\">gültigen Stimmen</span>, die Hürde bleiben ein Grundmandat oder vier Prozent bundesweit (sowie ein eingereichter Bundeswahlvorschlag).",
 	"Zur <span class=\"huge\">Berechnung</span> werden die Stimmen der Parteien nebeneinander geschrieben",
 	"Anschließend werden diese pro Zeile durch <span class=\"huge\">zwei, drei, vier</span> usw. geteilt. In dieser Tabelle wird die 183.-größte Zahl gesucht, sie ist die Wahlzahl.",
-	"2013 war diese Wahlzahl <span class=\"huge\"><span id=\"wzbund\"></span></span>. Die Mandate werden auf die Parteien aufgeteilt, indem man ihre Stimmen durch die Wahlzahl teilt.",
+	"2017 war diese Wahlzahl <span class=\"huge\"><span id=\"wzbund\"></span></span>. Die Mandate werden auf die Parteien aufgeteilt, indem man ihre Stimmen durch die Wahlzahl teilt.",
 	"Die Mandate aus <span class=\"huge\">Regional- und Landeswahlkreisen</span> müssen von diesem Ergebnis wieder abgezogen werden.",
 	"Mit diesen verbleibenden Mandaten ist der <span class=\"huge\">Nationalrat</span> komplett.",
 	"Was passiert, wenn man die <span class=\"huge\">4-Prozent-Hürde</span> bzw. das Grundmandat als Voraussetzung weglässt und alle Parteien am 3. Ermittlungsverfahren beteiligt?",
 	"Das <span class=\"huge\">Verfahren</span> bleibt gleich, die gültigen Stimmen werden wieder duch 2, 3, 4 usw. dividiert.",
 	"Wahlzahl wäre in diesem Fall <span class=\"huge\"><span id=\"wzbund\"></span></span>, von den Mandaten werden wieder die bereits erzielten abgezogen.",
-	"Damit erhalten mehr Parteien Mandate, z.B. hätte das <span class=\"huge\">BZÖ</span> 2013 davon sehr profitiert.",
+	"Damit erhalten mehr Parteien Mandate, die meisten davon die <span class=\"huge\">Grünen</span>, die nur knapp an der 4-Prozent-Grenze gescheitert sind.",
 	"Es gäbe aber auch <span class=\"huge\">Kleinstparteien</span> im Parlament, mit nur einem Abgeordneten, und mögliche andere Mehrheiten."
 	];
 	
 var txtc = 0;  //counter für die texte
 
 var aut = d3.formatLocale({"decimal":",", "thousands":".","grouping":[3],"currency":["€", ""]});
-var p_nr = ["spoe", "oevp", "fpoe", "gruene", "frank", "neos"];  // parteien, die den einzug schaffen
+var p_nr = ["spoe", "oevp", "fpoe", "neos", "pilz"];  // parteien, die den einzug schaffen
 var no_p = ["iso", "name", "wahlberechtigt", "abgegeben", "gueltig"];  //felder, die keine parteinamen sind
 var offsets = {"basis": {"3": -8, "19": -3, "22": -11}, "hex": {"6": 17, "16": 35, "19": 0, "32": 0, "34": 727, "37": 75}}; //offsets fürs morphing
-var margin = {top: 20, right: 10, bottom: 20, left: 10, map: 0};
+var margin = {top: 20, right: 0, bottom: 20, left: 0, map: 0};
 
 var colors = ["#F28184", "#DF89B0", "#AD9BCE", "#6AACCE", "#38B6B1", "#56B784", "#8BB159", "#BEA445", "#E69355"];  //farben für die bundesländer
 
@@ -65,16 +68,20 @@ var meta = {
 	"spoe": {"name": "SPÖ", "color": "#C83D44", "middle": "#db7f84", "light": "#edbfc1"}, 
 	"oevp": {"name": "ÖVP", "color": "#191919", "middle": "#676767", "light": "#b3b3b3"}, 
 	"fpoe": {"name": "FPÖ", "color": "#2657A8", "middle": "#7090c6", "light": "#b8c8e2"}, 
-	"gruene": {"name": "GRÜNE", "color": "#89A04F", "middle": "#b1c08b", "light": "#d8e0c5"}, 
 	"frank": {"name": "FRANK", "color": "#e3b65a", "middle": "#e3b65a", "light": "#ffd890"}, 
 	"neos": {"name": "NEOS", "color": "#c75a93", "middle": "#c75a93", "light": "#dd84b3"}, 
+	"pilz": {"name": "PILZ", "color": "#999999", "middle": "#aaaaaa", "light": "#cccccc"}, 
 	"rest": {"name": "übrige Mandate", "color": "#ffffff", "middle": "#ffffff", "light": "#ffffff"}, 
 	"bzoe": {"name": "BZÖ", "color": "orange", "middle": "orange", "light": "orange"},
 	"kpoe": {"name": "KPÖ", "color": "#8B0A12", "middle": "#BA2823", "light": "#E84838"},
-	"pirat": {"name": "PIRAT", "color": "#00624F", "middle": "#10A082", "light": "#1DC09D"},
+	"gilt": {"name": "GILT", "color": "yellow", "middle": "yellow", "light": "yellow"},
+	"gruene": {"name": "GRÜNE", "color": "#89A04F", "middle": "#b1c08b", "light": "#d8e0c5"}, 
+	"floe": {"name": "FLÖ", "color": "lightblue", "middle": "lightblue", "light": "lightblue"},
 	"cpoe": {"name": "CPÖ", "color": "#DCCB49", },
-	"wandl": {"name": "WANDL", "color": "#9E5C83"},
-	"m": {"name": "MÄNNER", "color": "#9E642C"},
+	"weisse": {"name": "WEISSE", "color": "#aaaaaa"},
+	"nbz": {"name": "NBZ", "color": "#aaaaaa"},
+	"odp": {"name": "ODP", "color": "#aaaaaa"},
+	"m": {"name": "MÄNNER", "color": "#aaaaaa"},
 	"euaus": {"name": "EUAUS", "color": "#52749A"},
 	"slp": {"name": "SLP", "color": "#F5412E"}};
 	
@@ -89,7 +96,7 @@ document.getElementById('desc').innerHTML = long_txt;
 var off = d3.select("#control").node().getBoundingClientRect().height;
 
 var width = parseInt(d3.select("#container").style("width"), 10) - margin.left - margin.right;
-var height = window.innerHeight - margin.top - margin.bottom - off - 30;
+var height = Math.max(window.innerWidth*0.8,500) - margin.top - margin.bottom - off - 30;
 
 d3.select("#control").style("height", (d3.select("#desc").node().getBoundingClientRect().height + d3.select("#button").node().getBoundingClientRect().height) + "px");
 document.getElementById('desc').innerHTML = texte[0];
@@ -100,7 +107,7 @@ var parties = [];  //alle parteien
 var dhondt = [];
 
 var xscale = d3.scaleBand().domain(p_nr).paddingOuter(0).paddingInner(1); 
-var yscale = d3.scaleBand().domain(d3.range(0, 53, 1)).paddingInner(0.3).paddingOuter(0);
+var yscale = d3.scaleBand().domain(d3.range(0, 63, 1)).paddingInner(0.3).paddingOuter(0);
 var subxscale = d3.scaleLinear().domain([0, 1]).range([0, 150]);  //tooltip
 var subyscale = d3.scaleBand().domain(p_nr).range([0, 150 - margin.bottom]).paddingOuter(0.5).paddingInner(0.05);
 var tabscale = d3.scaleOrdinal();
@@ -166,6 +173,7 @@ q.awaitAll(function(error)
 		maps.bl = topojson.feature(arguments[1][4], arguments[1][4].objects.landeswahlkreise);
 		daten = arguments[1][5];
 		daten_aut = daten[0];
+		console.log(daten_aut);
 		for (var x in daten[0])
 			{
 			if (no_p.indexOf(x) == -1) 
@@ -174,6 +182,7 @@ q.awaitAll(function(error)
 				stacks[x] = -1;
 				}
 			}
+		console.log(parties, stacks);
 		
 		var mandate = d3.nest().key(function(d) { return d.iso; }).object(arguments[1][6]);
 		var wahlzahlen = {};
@@ -295,6 +304,7 @@ d3.select("#button").text("Start");
 txtc += 1;
 
 document.getElementById("button").onclick = show;
+pymChild.sendHeight();
 }
 
 
@@ -315,6 +325,7 @@ svg.append("path")
 
 d3.select("#button").text("weiter");
 document.getElementById("button").onclick = laender;
+pymChild.sendHeight();
 }
 
 
@@ -345,6 +356,7 @@ for (var i = 0; i < 9; i++)
 
 
 document.getElementById("button").onclick = wahlkreise;
+pymChild.sendHeight();
 }
 
 function zruck()
@@ -396,6 +408,7 @@ svg.selectAll(".wks_temp")
 	});
 
 document.getElementById("button").onclick = distort;
+pymChild.sendHeight();
 }
 
 
@@ -461,6 +474,7 @@ svg.selectAll(".wks")
 	});
 
 document.getElementById("button").onclick = fill_it;
+pymChild.sendHeight();
 }
 
 
@@ -501,6 +515,7 @@ svg.selectAll(".fields")
 	.on("mouseout", funcs.fill_it_off);
 
 document.getElementById("button").onclick = results;
+pymChild.sendHeight();
 }
 
 
@@ -542,6 +557,7 @@ svg.selectAll(".fields, .done")
 	.on("mouseout", funcs.results_off);
 
 document.getElementById("button").onclick = rwk;
+pymChild.sendHeight();
 }
 
 
@@ -552,7 +568,7 @@ forward();
 svg.selectAll("defs").remove();
 
 glabeling.selectAll(".labels")
-	.data(xscale.domain())
+	.data(xscale.domain(), function(x) { return x; })
 	.enter()
 	.append("text")
 	.attr("x", function(d) { return xscale(d); })
@@ -566,7 +582,7 @@ glabeling.selectAll(".counters")
 	.append("text")
 	.attr("x", function(d) { return xscale(d); })
 	.attr("y", yscale(0) + woff.fieldkl * 2)
-	.attr("dy", function() { return window.matchMedia("(min-width: 720px)").matches ? "1em" : "0em"; })
+	.attr("dy", function() { return window.matchMedia("(min-width: 600px)").matches ? "1em" : "0em"; })
 	.attr("id", function(d) { return "counters_" + d; })
 	.attr("class", "counters")
 	.transition()
@@ -609,6 +625,7 @@ done.on("mouseover", null).on("mouseout", null);
 gcontent.selectAll(".fields").on("mouseover", funcs.rwk).on("mouseout", funcs.rwk_off);
 
 document.getElementById("button").onclick = lwk;
+pymChild.sendHeight();
 }
 
 
@@ -667,6 +684,7 @@ fields.attr("class", function(d) { return d.properties.hasOwnProperty('won') ? "
 	.on("end", function(d, i) { if (i == size) restore(); });
 	
 document.getElementById("button").onclick = lwk2;
+pymChild.sendHeight();
 }
 
 
@@ -713,6 +731,7 @@ gcontent.selectAll(".fields")
 	.on("mouseout", funcs.lwk2_off);
 
 document.getElementById("button").onclick = bwk;
+pymChild.sendHeight();
 }
 
 
@@ -729,7 +748,7 @@ curr.length = 0;
 svg.selectAll(".units").remove();
 
 glabeling.selectAll(".labels")
-	.data(xscale.domain().filter(function(d) { return d != ""; }))
+		.data(xscale.domain().filter(function(d) { return d != ""; }), function(d) { return d; })
 	.enter()
 	.append("text")
 	.attr("x", xscale("rest"))
@@ -745,7 +764,7 @@ glabeling.selectAll(".counters")
 	.append("text")
 	.attr("x", function(d) { return xscale(d); })
 	.attr("y", yscale(0) + woff.fieldkl * 2)
-	.attr("dy", function() { return window.matchMedia("(min-width: 720px)").matches ? "1em" : "0em"; })
+	.attr("dy", function() { return window.matchMedia("(min-width: 600px)").matches ? "1em" : "0em"; })
 	.attr("id", function(d) { return "counters_" + d; })
 	.attr("class", "counters")
 	.style("visibility", "hidden")
@@ -785,6 +804,7 @@ fields.transition()
 
 fields.on("mouseover", null).on("mouseout", null);
 document.getElementById("button").onclick = enlarge;
+pymChild.sendHeight();
 }
 
 
@@ -795,14 +815,16 @@ forward();
 svg.selectAll(".fields, #label_rest, #counters_rest").remove();
 
 width = parseInt(d3.select("#container").style("width"), 10) - margin.left - margin.right;
-height = window.innerHeight - margin.top - margin.bottom - parseInt(d3.select("#control").style("height"), 10) - 30;
+height = Math.max(window.innerHeight - margin.top - margin.bottom - parseInt(d3.select("#control").style("height"), 10) - 30,200);
+
+console.log('height enlarge', height)
 
 xscale.domain(p_nr);
 tabscale.domain(xscale.domain());
 
 postab(); //positionen für die tabellen berechnen
 
-yscale.range([height - margin.bottom * 3 - woff.field, margin.top + woff.tabheight * 7]);
+yscale.range([height - margin.bottom * 3 - woff.field, margin.top + woff.tabheight * 3]);
 
 gcontent.selectAll(".done, .done2")
 	.transition()
@@ -848,6 +870,7 @@ gcontent.append("rect")
 	.style("display", "none");
 
 document.getElementById("button").onclick = function() { make_header("normal"); };
+pymChild.sendHeight();
 }
 
 
@@ -953,6 +976,7 @@ for (var k = 0, len = parties_s.length; k < len; k++)
 
 restore();
 document.getElementById("button").onclick = function() { make_rect(step); };
+pymChild.sendHeight();
 }
 
 
@@ -975,7 +999,7 @@ gcontent.select("#overlay")
 
 var speed_up = timed / 7.5;
 
-for (var i = 2; i < 55; i++)
+for (var i = 2; i < 64; i++)
 	{
 	var y = woff.tabheight * i + 4 * i;
 	
@@ -1068,6 +1092,7 @@ glayer.select("#" + wz).select("path").style("stroke", "#ca556a").style("stroke-
 
 restore_btn(timed * 1.5);
 document.getElementById("button").onclick = function() { color_tab(step); };
+pymChild.sendHeight();
 }
 
 
@@ -1093,6 +1118,7 @@ gs.select(".innercell")
 
 restore();
 document.getElementById("button").onclick = function() { subtract(step); };
+pymChild.sendHeight();
 }
 
 
@@ -1121,9 +1147,11 @@ for (var i = 0, len = parties_s.length; i < len; i++)
 				d3.select("#svg").attr("height", height + margin. top + margin.bottom);
 				restore();
 				if (step == "normal") document.getElementById("button").onclick = ende; else document.getElementById("button").onclick = ende_alt;
+pymChild.sendHeight();
 				}
 			});
 	}
+pymChild.sendHeight();
 }
 
 
@@ -1174,8 +1202,10 @@ g.lower()
 			{
 			restore();
 			document.getElementById("button").onclick = ohne_huerde;
+			pymChild.sendHeight();
 			}
 		});
+pymChild.sendHeight();
 }
 
 
@@ -1217,6 +1247,7 @@ normal.transition()
 				.attr("y", yscale.range()[0] + woff.height);
 			}
 		});
+pymChild.sendHeight();
 }
 
 
@@ -1243,24 +1274,26 @@ tabscale.domain().forEach(function(d)
 	});
 
 glabeling.selectAll(".labels")
-	.data(tabscale.domain())
+	.data(tabscale.domain(),function(x) { return x; })
 	.enter()
 	.append("text")
+	.attr("class", "labels")
+glabeling.selectAll(".labels")
 	.attr("x", function(d) { return tabscale(d); })
 	.attr("y", yscale.range()[0] + woff.height)
-	.attr("class", "labels")
 	.text(function(d) { return meta[d].name; });
 
 glabeling.selectAll(".counters").style("display", "none");
 
 glabeling.selectAll(".counters2")
-	.data(tabscale.domain())
+	.data(tabscale.domain(), function(x) { return x; })
 	.enter()
 	.append("text")
+	.attr("class", "counters2")
+glabeling.selectAll(".counters2")
 	.attr("x", function(d, i) { return tabscale(d); })
 	.attr("y", yscale.range()[0] + woff.height)
-	.attr("dy", function() { return window.matchMedia("(min-width: 720px)").matches ? "1em" : "0em"; })
-	.attr("class", "counters2")
+	.attr("dy", function() { return window.matchMedia("(min-width: 600px)").matches ? "1em" : "0em"; })
 	.attr("id", function(d) { return "counters2_" + d; })
 	.text(function(d) { return gcontent.selectAll(".done, .done2").filter(function(k) { return k.p == d; }).size(); });  //weil 0
 
@@ -1293,8 +1326,10 @@ g.lower()
 			{
 			restore();
 			document.getElementById("button").onclick = re_scale;
+			pymChild.sendHeight();
 			}
 		});
+pymChild.sendHeight();
 }
 
 
@@ -1308,8 +1343,9 @@ parties.forEach(function(d)
 	});
 
 tabscale.domain(final_parties);
-glabeling.selectAll(".counters2").data(tabscale.domain()).exit().remove();
-glabeling.selectAll(".labels").data(tabscale.domain()).exit().remove();
+glabeling.selectAll(".counters2").data(tabscale.domain(),function(x) { return x; }).exit().remove();
+glabeling.selectAll(".counters").data(tabscale.domain(), function(x) { return x; }).exit().remove();
+glabeling.selectAll(".labels").data(tabscale.domain(), function(x) { return x; }).exit().remove();
 postab();
 
 yscale.range([height - margin.bottom * 3 - woff.field, margin.top]);
@@ -1333,13 +1369,13 @@ hexes.transition()
 				.attr("y", yscale.range()[0] + woff.height);
 			
 			glabeling.selectAll(".counters")
-				.data(tabscale.domain())
+				.data(tabscale.domain(), function(x) { return x; })
 				.transition()
 				.duration(timed)
 				.attr("x", function(d, i) { return tabscale(d); });
 
 			glabeling.selectAll(".counters2")
-				.data(tabscale.domain())
+				.data(tabscale.domain(), function(x) { return x; })
 				.transition()
 				.duration(timed)
 				.attr("x", function(d, i) { return tabscale(d); });
@@ -1373,6 +1409,7 @@ hexes.transition()
 				.transition()
 				.duration(timed)
 				.attr("transform", "translate(" + (-woff.field / 2 - 1) + ", 0)")
+				.attr("x", function(d, i) { return tabscale(d); })
 				.style("display", "block");
 
 			glabeling.selectAll(".counters2")
@@ -1389,6 +1426,7 @@ hexes.transition()
 			legende();
 			}
 		});
+pymChild.sendHeight();
 }
 
 
