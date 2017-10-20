@@ -1,0 +1,323 @@
+body
+{
+margin: 0;
+padding: 0;
+font-family: "Roboto", sans-serif;
+font-size: 12px;
+}
+
+svg
+{
+overflow:hidden;
+}
+
+a:link, a:visited, a:hover, a:active 
+{
+color: #648ace;
+}
+
+#container
+{
+position: relative;
+width: 95vw;
+margin: 0; /* auto 0 auto;*/
+}
+
+#control
+{
+position: relative;
+margin: 15px 0 0 2vw;  /*statt oben*/
+text-align: left;
+z-index: 2;
+}
+
+#desc
+{
+display: inline-block;
+text-align: left;
+max-width: 100%;
+line-height: 1.5em;
+border-bottom-style: solid;
+border-bottom-color: #648ace;
+border-bottom-width: 2px;
+padding-bottom: 3px;
+}
+
+#map
+{
+display: block;
+position:relative;
+z-index: 1;
+}
+
+#button
+{
+background-color: #ffffff;
+width: 50px;
+margin-top: 5px;
+padding: 7px;
+border-style: solid;
+border-color: #648ace;
+border-width: 2px;
+border-top-color: #ffffff;
+border-right-color: #ffffff;
+border-radius: 3px;
+color: #000000;
+cursor: pointer;
+text-align: center;
+}
+
+#button:hover
+{
+border-top-color: #648ace;
+border-right-color: #648ace;
+background-color: #648ace;
+color: #ffffff
+}
+
+#button.dis
+{
+cursor: default;
+color: #d9d9d9;
+pointer-events: none;
+border-color: #ffffff;
+background-color: #ffffff;
+}
+
+#content
+{
+position: relative;
+}
+
+#footer
+{
+position: absolute;
+bottom: 0px;
+left: 0px;
+font-size: 10px;
+display: none;
+max-width: 50%;
+}
+
+#logo
+{
+position: absolute;
+bottom: 0px;
+right: 0px;
+display: none;
+}
+
+#tool
+{
+position: absolute;
+display: none;
+background-color: #ffffff;
+box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+pointer-events: none;
+width: 175px;
+font-size: 12px;
+border-radius: 3px;
+z-index: 3;
+}
+
+.toolhead
+{
+padding: 10px;
+margin-bottom: 5px;
+background-color: #000000;
+color: #ffffff;
+border-top-left-radius: 3px;
+border-top-right-radius: 3px;
+}
+
+.toolcontent
+{
+padding: 10px;
+background-color: #ffffff;
+color: #000000;
+line-height: 2em;
+border-radius: 3px;
+}
+
+.toolfoot
+{
+padding-left: 5px;
+margin-top: 1em;
+font-size: 10px;
+}
+
+.units
+{
+stroke: #ffffff;
+stroke-width: 2px;
+}
+
+.units.swsm
+{
+stroke-width: 1px;
+}
+
+.units.hex
+{
+stroke: #8caae2;
+fill: none;
+}
+
+.units.hl
+{
+stroke-width: 2px;
+}
+
+#aut, .laender, .wks, .wks_temp
+{
+stroke-width: 1px;
+fill: none;
+}
+
+.labels, .counters, .counters2
+{
+font-size: 10px;
+dominant-baseline: central;
+text-anchor: middle;
+}
+
+.labels
+{
+display: none;
+}
+
+.numbers
+{
+font-size: 10px;
+text-anchor: end;
+dominant-baseline: hanging;
+display: none;
+}
+
+.innercell
+{
+font-size: 10px;
+}
+
+.divisor
+{
+font-size: 12px;
+}
+
+#divide
+{
+stroke: #000000;
+}
+
+.calc
+{
+visibility: hidden;
+font-size: 10px;
+}
+
+.wks:hover
+{
+fill: yellow !important;
+}
+
+.difference
+{
+stroke: none;
+fill: #000000;
+font-size: 10px;
+dominant-baseline: central;
+text-anchor: end;
+}
+
+.gm
+{
+stroke-dasharray: 4, 4;
+stroke: #636363;
+}
+
+.gmtxt
+{
+font-size: 10px;
+fill: #000000;
+stroke: none;
+}
+
+.huge
+{
+font-size: 18px;
+}
+
+@media screen and (min-width: 720px)
+{
+.labels
+{
+display: block;
+}
+}
+
+@media screen and (min-width: 720px), screen and (orientation: portrait)
+{
+#tab
+{
+overflow-x: hidden;
+}
+}
+
+@media screen and (min-width: 1024px)
+{
+body
+{
+font-size: 14px;
+}
+
+.calc, .innercell
+{
+font-size: 12px;
+}
+
+.labels, .counters, .counters2
+{
+font-size: 12px;
+}
+
+#desc
+{
+max-width: 75%;
+}
+
+.huge
+{
+font-size: 24px;
+}
+
+.units
+{
+stroke-width: 4px;
+}
+
+.units.hl
+{
+stroke-width: 4px;
+}
+
+.divisor
+{
+font-size: 16px;
+}
+}
+
+@media screen and (min-width: 1600px)
+{
+#desc
+{
+max-width: 50%;
+}
+}
+
+@media screen and (orientation: landscape)
+{
+#map
+{
+display: inline-block;
+}
+}
