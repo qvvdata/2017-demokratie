@@ -20,6 +20,7 @@ color: #648ace;
 {
 position: relative;
 width: 95vw;
+max-width: 100%;
 margin: 0; /* auto 0 auto;*/
 }
 
@@ -29,6 +30,7 @@ position: relative;
 margin: 15px 0 0 2vw;  /*statt oben*/
 text-align: left;
 z-index: 2;
+max-height: 250px;
 }
 
 #desc
